@@ -1,6 +1,9 @@
 import styled from "styled-components";
 
 import React from "react";
+import LeftSide from "./LeftSide";
+import Main from "./Main";
+import RightSide from "./RightSide";
 
 const Home = (props) => {
   return (
@@ -16,9 +19,9 @@ const Home = (props) => {
       </Section>
 
       <Layout>
-        <div className="left">left</div>
-        <div className="main">main</div>
-        <div className="right">right</div>
+        <LeftSide className="left"></LeftSide>
+        <Main className="main"></Main>
+        <RightSide className="right"></RightSide>
       </Layout>
     </Container>
   );
@@ -65,30 +68,8 @@ const Section = styled.section`
 
 const Layout = styled.div`
   display: flex;
-  justify-content: space-between;
-  .left {
-    flex: 0.2;
-    text-align: center;
-    margin: 2px;
+  justify-content: space-evenly;
 
-    border: 1px red solid;
-  }
-  .main {
-    flex: 0.6;
-    text-align: center;
-    border: 1px red solid;
-    margin: 2px;
-
-    display: flex;
-    justify-content: center;
-  }
-  .right {
-    margin: 2px;
-
-    flex: 0.2;
-    border: 1px red solid;
-    text-align: center;
-  }
   @media (max-width: 768px) {
     flex-direction: column;
     padding: 0 5px;
