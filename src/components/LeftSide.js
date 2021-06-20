@@ -28,8 +28,24 @@ const LeftSide = (props) => {
           <span>
             <img src="images/item-icon.svg" alt="" />
           </span>
+          <p>My Items</p>
         </Item>
       </ArtCard>
+      <ArtCard2>
+        <a>
+          <List>
+            <li>Groups</li>
+            <li>Events</li>
+            <li>Follow Hastags</li>
+          </List>
+          <div>
+            <img src="/images/plus-icon.svg" alt="" />
+          </div>
+        </a>
+        <Discover>
+          <a>Discover more</a>
+        </Discover>
+      </ArtCard2>
     </Container>
   );
 };
@@ -37,7 +53,6 @@ const LeftSide = (props) => {
 const Container = styled.div`
   flex: 0.2;
   /* text-align: center; */
-  margin: 2px;
 
   /* border: 1px red solid; */
 `;
@@ -94,7 +109,80 @@ const AddPhotoText = styled.div`
   line-height: 1.33;
   font-weight: 400;
 `;
-const Widget = styled.div``;
-const Item = styled.div``;
+const Widget = styled.div`
+  padding-top: 12px;
+  padding-bottom: 12px;
+  & > a {
+    text-decoration: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 12px;
+
+    & > div {
+      display: flex;
+      flex-direction: column;
+      justify-content: start;
+      align-items: start;
+      text-align: left;
+      span {
+        font-size: 12px;
+        line-height: 1.33;
+        &:first-child {
+          color: rgba(0, 0, 0, 0.6);
+        }
+        &:nth-child(2) {
+          color: rgba(0, 0, 0, 1);
+        }
+      }
+    }
+  }
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+`;
+const Item = styled.div`
+  display: flex;
+  padding: 12px;
+  align-items: center;
+  text-align: left;
+  border-color: rgba(0, 0, 0, 0.8);
+  font-size: 12px;
+  font-weight: 600;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+`;
+
+const ArtCard2 = styled(ArtCard)`
+  display: flex;
+  flex-direction: column;
+  & > a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+  }
+`;
+const List = styled.ul`
+  list-style: none;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.83;
+`;
+
+const Discover = styled.div`
+  border-top: 1px solid rgba(0, 0, 0, 0.18);
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.88);
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.15);
+  }
+`;
 
 export default LeftSide;

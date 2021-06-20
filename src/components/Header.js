@@ -90,7 +90,7 @@ const Container = styled.div`
   left: 0;
   padding: 0 24px;
   top: 0;
-  width: 100vw;
+  width: 100%;
   z-index: 100;
 `;
 const Content = styled.div`
