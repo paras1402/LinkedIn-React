@@ -1,14 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-
+import PostModal from "./PostModal";
 const Main = () => {
+  const [showModal, setShowModal] = useState(false);
+  const handler = () => {
+    setShowModal(!showModal);
+  };
   return (
     <Container>
       <ShareBox>
         Share
         <div>
           <img src="/images/user.svg" alt="" />
-          <button className="btn">Start a post</button>
+          <button className="btn" onClick={handler}>
+            Start a post
+          </button>
         </div>
         <div>
           <button>
@@ -81,6 +87,8 @@ const Main = () => {
           </button>
         </SocialActions>
       </Article>
+
+      {showModal && <PostModal onClose={handler}></PostModal>}
     </Container>
   );
 };
