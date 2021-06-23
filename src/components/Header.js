@@ -1,8 +1,14 @@
 import styled from "styled-components";
 
 import React from "react";
-
+import { useDispatch, useSelector } from "react-redux";
+import { logout, selectUser } from "../features/userSlice";
+import { Redirect } from "react-router";
+import { auth } from "../firebase";
 const Header = (props) => {
+  const user = useSelector(selectUser);
+  const dispatch = useDispatch();
+
   return (
     <Container>
       <Content>
@@ -54,14 +60,23 @@ const Header = (props) => {
 
             <User>
               <a>
-                <img src="/images/user.svg" alt="" />
+                {user ? (
+                  <img src={user?.photo} alt="" />
+                ) : (
+                  <img src="/images/user.svg" alt="" />
+                )}
+
                 <div className="text">
-                  <span>Me</span>
+                  <span>{user ? user.displayName : "Me"}</span>
                   <img src="/images/down-icon.svg" alt="" />
                 </div>
               </a>
 
-              <SignOut>
+              <SignOut
+                onClick={() => {
+                  auth.signOut();
+                }}
+              >
                 <a>Sign Out</a>
               </SignOut>
             </User>

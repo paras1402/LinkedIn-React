@@ -1,33 +1,52 @@
 import styled from "styled-components";
 
 import React from "react";
-
+import { auth, provider } from "../firebase";
+import { useSelector } from "react-redux";
+import { selectUser } from "../features/userSlice";
+import { Redirect } from "react-router";
 export const Login = (props) => {
+  const signIn = () => {
+    auth
+      .signInWithPopup(provider)
+      .then((provider) => {
+        console.log(provider);
+      })
+      .catch((error) => alert(error.message));
+  };
+
+  const user = useSelector(selectUser);
+  console.log("this s user", user);
   return (
     <Container>
-      <Nav>
-        <a>
-          <img src="/images/login-logo.svg" alt="login"></img>
-        </a>
+      {user && <Redirect to="/home"></Redirect>}
+      {!user && (
+        <>
+          {" "}
+          <Nav>
+            <a>
+              <img src="/images/login-logo.svg" alt="login"></img>
+            </a>
 
-        <div>
-          <Join>Join Now</Join>
-          <SignIn>SignIn</SignIn>
-        </div>
-      </Nav>
-
-      <Section>
-        <Hero>
-          <h1>Welcome to your professional community</h1>
-          <img src="/images/login-hero.svg" alt="hero" />
-        </Hero>
-        <Form>
-          <Google>
-            <img src="/images/google.svg" alt="" />
-            Sign in with Google
-          </Google>
-        </Form>
-      </Section>
+            <div>
+              <Join>Join Now</Join>
+              <SignIn>SignIn</SignIn>
+            </div>
+          </Nav>
+          <Section>
+            <Hero>
+              <h1>Welcome to your professional community</h1>
+              <img src="/images/login-hero.svg" alt="hero" />
+            </Hero>
+            <Form>
+              <Google onClick={signIn}>
+                <img src="/images/google.svg" alt="" />
+                Sign in with Google
+              </Google>
+            </Form>
+          </Section>
+        </>
+      )}
     </Container>
   );
 };
@@ -148,6 +167,7 @@ const Form = styled.div`
     margin-top: 20px;
   }
 `;
+
 const Google = styled.button`
   display: flex;
   justify-content: center;

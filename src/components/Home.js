@@ -4,10 +4,14 @@ import React from "react";
 import LeftSide from "./LeftSide";
 import Main from "./Main";
 import RightSide from "./RightSide";
-
+import { Redirect } from "react-router";
+import { useSelector } from "react-redux";
+import { selectUser } from "../features/userSlice";
 const Home = (props) => {
+  const user = useSelector(selectUser);
   return (
     <Container>
+      {!user && <Redirect to="/"></Redirect>}
       <Section>
         <h5>
           <a>Hiring in a hurry? - </a>
