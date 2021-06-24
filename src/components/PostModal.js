@@ -1,12 +1,94 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import ReactPlayer from "react-player";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from "../features/userSlice";
+import db, { storage } from "../firebase";
+import firebase from "firebase";
+import { selectArticleLoading } from "../features/articleSlice";
+import { setLoadingBar } from "../features/articleSlice";
 const PostModal = (props) => {
   const [editorText, setEditorText] = useState("");
   const [sharedImage, setSharedImage] = useState("");
   const [videoLink, setVideoLink] = useState("");
-
   const [assetArea, setAssetArea] = useState("");
+
+  const user = useSelector(selectUser);
+
+  const dispatch = useDispatch();
+  const loading = useSelector(selectArticleLoading);
+
+  const imageupload = (payload) => {
+    dispatch(setLoadingBar(true));
+
+    console.log("loading status", loading);
+    if (payload.image) {
+      const uploadTask = storage
+        .ref(`/images/${payload.image.name}`)
+        .put(payload.image);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log(`progress:${progress}%`);
+          if (snapshot.state === "running") {
+            console.log(`progress:${progress}%`);
+          }
+        },
+        (error) => {
+          console.log(error.code);
+        },
+        async () => {
+          const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+          db.collection("articles").add({
+            actor: {
+              email: payload.user.email,
+              title: payload.user.displayName,
+              date: payload.timestamp,
+              image: payload.user.photo,
+            },
+
+            video: payload.video,
+            sharedImg: downloadURL,
+            comments: 0,
+            description: payload.description,
+          });
+          dispatch(setLoadingBar(false));
+        }
+      );
+    } else if (payload.video) {
+      db.collection("articles").add({
+        actor: {
+          email: payload.user.email,
+          title: payload.user.displayName,
+          date: payload.timestamp,
+          image: payload.user.photo,
+        },
+        video: payload.video,
+        sharedImg: "",
+        comments: 0,
+        description: payload.description,
+      });
+      dispatch(setLoadingBar(false));
+    } else {
+      db.collection("articles").add({
+        actor: {
+          email: payload.user.email,
+          title: payload.user.displayName,
+          date: payload.timestamp,
+          image: payload.user.photo,
+        },
+        video: "",
+        sharedImg: "",
+        comments: 0,
+        description: payload.description,
+      });
+      dispatch(setLoadingBar(false));
+    }
+    dispatch(setLoadingBar(false));
+    console.log("loading status", loading);
+  };
 
   const imageChangeHandler = (e) => {
     const image = e.target.files[0];
@@ -22,6 +104,24 @@ const PostModal = (props) => {
     setSharedImage("");
     setVideoLink("");
     setAssetArea(area);
+  };
+
+  const postArticle = (e) => {
+    e.preventDefault();
+    if (e.target !== e.currentTarget) {
+      return;
+    }
+
+    const payload = {
+      image: sharedImage,
+      video: videoLink,
+      user: user,
+      description: editorText,
+      timestamp: firebase.firestore.Timestamp.now(),
+    };
+
+    imageupload(payload);
+    handler();
   };
 
   const handler = () => {
@@ -43,8 +143,13 @@ const PostModal = (props) => {
 
         <SharedContent>
           <UserInfo>
-            <img src="/images/user.svg" alt="" />
-            <span>Name</span>
+            {user?.photo ? (
+              <img src={user.photo}></img>
+            ) : (
+              <img src="/images/user.svg" alt="" />
+            )}
+
+            <span>{user?.displayName}</span>
           </UserInfo>
           <Editor>
             <textarea
@@ -102,7 +207,14 @@ const PostModal = (props) => {
             </AssetButton>
           </ShareComment>
 
-          <PostButton disabled={!editorText ? true : false}>Post</PostButton>
+          <PostButton
+            onClick={(event) => {
+              postArticle(event);
+            }}
+            disabled={!editorText ? true : false}
+          >
+            Post
+          </PostButton>
         </ShareCreation>
       </Content>
     </Container>
@@ -256,4 +368,5 @@ const UploadImage = styled.div`
     width: 100%;
   }
 `;
+
 export default PostModal;

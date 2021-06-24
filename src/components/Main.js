@@ -1,95 +1,155 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import { selectArticleLoading, selectArticles } from "../features/articleSlice";
+import { selectUser } from "../features/userSlice";
+import db from "../firebase";
 import PostModal from "./PostModal";
+import { setArticles } from "../features/articleSlice";
+import ReactPlayer from "react-player";
 const Main = () => {
   const [showModal, setShowModal] = useState(false);
+  const user = useSelector(selectUser);
   const handler = () => {
     setShowModal(!showModal);
   };
+  const loading = useSelector(selectArticleLoading);
+  const articles = useSelector(selectArticles);
+  const dispatch = useDispatch();
+
+  const getArticles = () => {
+    let payload;
+    db.collection("articles")
+      .orderBy("actor.date", "desc")
+      .onSnapshot((snapshot) => {
+        payload = snapshot.docs.map((doc) => doc.data());
+
+        dispatch(setArticles(payload));
+      });
+  };
+
+  useEffect(() => {
+    getArticles();
+    // console.log(articles);
+  }, []);
+
   return (
-    <Container>
-      <ShareBox>
-        Share
-        <div>
-          <img src="/images/user.svg" alt="" />
-          <button className="btn" onClick={handler}>
-            Start a post
-          </button>
-        </div>
-        <div>
-          <button>
-            <img src="https://img.icons8.com/nolan/64/stack-of-photos.png" />
-            <span>Photo</span>
-          </button>
-          <button>
-            <img src="https://img.icons8.com/wired/64/26e07f/video.png" />
-            <span>Video</span>
-          </button>
-          <button>
-            <img src="https://img.icons8.com/color/48/000000/tear-off-calendar--v2.png" />
-            <span>Event</span>
-          </button>
-          <button>
-            <img src="/images/post.png" />
-            <span>Write Article</span>
-          </button>
-        </div>
-      </ShareBox>
-      <Article>
-        <SharedActor>
-          <a>
-            <img src="/images/user.svg" alt="" />
-            <div>
-              <span>Title</span>
-              <span>Info</span>
-              <span>Date</span>
-            </div>
-          </a>
-          <button>
-            <img src="/images/ellipses.png" alt="" />
-          </button>
-        </SharedActor>
-        <Description>Description</Description>
-        <SharedImage>
-          <a>
-            <img src="/images/tree.jpg" alt="" />
-          </a>
-        </SharedImage>
-
-        <SocialCounts>
-          <li>
-            <button>
-              <img src="/images/like.png" alt="" />
-              <img src="/images/clap.png" alt="" />
-              <span>75</span>
+    <>
+      <Container>
+        <ShareBox>
+          <div>
+            {user && user.photo ? (
+              <img src={user.photo} alt="" />
+            ) : (
+              <img src="/images/user.svg" alt="" />
+            )}
+            <button
+              className="btn"
+              onClick={handler}
+              disabled={loading ? true : false}
+            >
+              Start a post
             </button>
-          </li>
-          <li>
-            <a>2 Comments</a>
-          </li>
-        </SocialCounts>
-        <SocialActions>
-          <button>
-            <img src="/images/like.png" alt="" />
-            <span>Like</span>
-          </button>
-          <button>
-            <img src="/images/comment.png" alt="" />
-            <span>Comment</span>
-          </button>
-          <button>
-            <img src="/images/share.png" alt="" />
-            <span>Share</span>
-          </button>
-          <button>
-            <img src="/images/send.png" alt="" />
-            <span>Send</span>
-          </button>
-        </SocialActions>
-      </Article>
+          </div>
+          <div>
+            <button>
+              <img src="https://img.icons8.com/nolan/64/stack-of-photos.png" />
+              <span>Photo</span>
+            </button>
+            <button>
+              <img src="https://img.icons8.com/wired/64/26e07f/video.png" />
+              <span>Video</span>
+            </button>
+            <button>
+              <img src="https://img.icons8.com/color/48/000000/tear-off-calendar--v2.png" />
+              <span>Event</span>
+            </button>
+            <button>
+              <img src="/images/post.png" />
+              <span>Write Article</span>
+            </button>
+          </div>
+        </ShareBox>
+        {articles.length === 0 ? (
+          <p>there are no articles</p>
+        ) : (
+          <Content>
+            {loading && <img src="/images/spinner.gif" alt="" />}
 
-      {showModal && <PostModal onClose={handler}></PostModal>}
-    </Container>
+            {articles.map((article, key) => {
+              return (
+                <Article key={key}>
+                  <SharedActor>
+                    <a>
+                      <img src={article.actor.image} alt="" />
+                      <div>
+                        <span style={{ fontSize: "14px" }}>
+                          {article.actor.title}
+                        </span>
+                        <span>{article.actor.email}</span>
+                        <span>
+                          {article.actor.date.toDate().toLocaleDateString()}
+                        </span>
+                      </div>
+                    </a>
+                    <button>
+                      <img src="/images/ellipses.png" alt="" />
+                    </button>
+                  </SharedActor>
+                  <Description>{article.description}</Description>
+                  <SharedImage>
+                    <a>
+                      {!article.image && article.video ? (
+                        <ReactPlayer
+                          width={"100%"}
+                          url={article.video}
+                        ></ReactPlayer>
+                      ) : (
+                        article.sharedImg && (
+                          <img src={article.sharedImg} alt="" />
+                        )
+                      )}
+                    </a>
+                  </SharedImage>
+
+                  <SocialCounts>
+                    <li>
+                      <button>
+                        <img src="/images/like.png" alt="" />
+                        <img src="/images/clap.png" alt="" />
+                        <span>75</span>
+                      </button>
+                    </li>
+                    <li>
+                      <a>{article.comments} Comments</a>
+                    </li>
+                  </SocialCounts>
+                  <SocialActions>
+                    <button>
+                      <img src="/images/like.png" alt="" />
+                      <span>Like</span>
+                    </button>
+                    <button>
+                      <img src="/images/comment.png" alt="" />
+                      <span>Comment</span>
+                    </button>
+                    <button>
+                      <img src="/images/share.png" alt="" />
+                      <span>Share</span>
+                    </button>
+                    <button>
+                      <img src="/images/send.png" alt="" />
+                      <span>Send</span>
+                    </button>
+                  </SocialActions>
+                </Article>
+              );
+            })}
+          </Content>
+        )}
+        {showModal && <PostModal onClose={handler}></PostModal>}
+      </Container>
+    </>
   );
 };
 
@@ -113,6 +173,7 @@ const Container = styled.div`
 const ShareBox = styled(CommonCard)`
   display: flex;
   flex-direction: column;
+  padding-top: 15px;
   color: #958b7b;
   margin: 0 0 8px;
   background: white;
@@ -175,10 +236,12 @@ const Article = styled(CommonCard)`
 const SharedActor = styled.div`
   /* padding-right: 40px; */
   flex-wrap: nowrap;
-  padding: 12px 16px 0;
+  padding: 14px 16px 0;
   margin-bottom: 8px;
   align-items: center;
   display: flex;
+  font-size: 12px;
+
   a {
     margin-right: 12px;
     flex-grow: 1;
@@ -189,6 +252,7 @@ const SharedActor = styled.div`
     img {
       width: 48px;
       height: 48px;
+      border-radius: 50%;
     }
     & > div {
       display: flex;
@@ -200,7 +264,7 @@ const SharedActor = styled.div`
       span {
         text-align: left;
         &:first-child {
-          font-size: 14px;
+          font-size: 40px;
           font-weight: 700;
           color: rgba(0, 0, 0, 1);
         }
@@ -305,4 +369,11 @@ const SocialActions = styled.div`
     }
   }
 `;
+const Content = styled.div`
+  text-align: center;
+  & > img {
+    width: 50%;
+  }
+`;
+
 export default Main;

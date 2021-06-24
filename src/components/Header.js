@@ -67,7 +67,7 @@ const Header = (props) => {
                 )}
 
                 <div className="text">
-                  <span>{user ? user.displayName : "Me"}</span>
+                  <span>Me</span>
                   <img src="/images/down-icon.svg" alt="" />
                 </div>
               </a>
@@ -228,10 +228,15 @@ const SignOut = styled.div`
   border-radius: 0 0 5px 5px;
   width: 100px;
   height: 40px;
-  font-size: 16px;
+  font-size: 18px;
   transition-duration: 167ms;
   text-align: center;
   display: none;
+  font-weight: 700;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+  }
 `;
 
 const User = styled(NavList)`
@@ -243,6 +248,7 @@ const User = styled(NavList)`
   span {
     display: flex;
     align-items: center;
+    font-weight: 700;
   }
 
   .text {
@@ -253,6 +259,12 @@ const User = styled(NavList)`
       align-items: center;
       display: flex;
       justify-content: center;
+      @media (max-width: 768px) {
+        position: absolute;
+        top: -40px;
+        z-index: 100;
+        border-radius: 5px 5px 0 0;
+      }
     }
   }
 `;

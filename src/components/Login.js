@@ -30,7 +30,7 @@ export const Login = (props) => {
 
             <div>
               <Join>Join Now</Join>
-              <SignIn>SignIn</SignIn>
+              <SignIn onClick={signIn}>SignIn</SignIn>
             </div>
           </Nav>
           <Section>
@@ -104,6 +104,7 @@ const SignIn = styled.a`
     background-color: rgba(112, 181, 249, 0.15);
     color: #0a66c2;
     text-decoration: none;
+    cursor: pointer;
   }
 `;
 const Section = styled.div`
@@ -187,4 +188,5 @@ const Google = styled.button`
     background-color: rgba(207, 207, 207, 0.25);
     color: rgba(0, 0, 0, 0.75);
   }
+  cursor: pointer;
 `;
